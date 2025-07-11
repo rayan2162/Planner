@@ -2,7 +2,7 @@
 
 A simple and offline-friendly day planner built with HTML, CSS, and JavaScript — designed to help users stay organized and focused.
 
-![Screenshot of Planner app](./planner.png)
+![Screenshot of Planner app](planner.png)
 
 ## ✨ Features
 
