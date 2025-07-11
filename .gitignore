@@ -1,7 +1,0 @@
-node_modules/
-.DS_Store
-dist/
-Planner-darwin-x64/
-Planner-win32-x64/
-coverage/
-.vscode/
