@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Day Planner</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #e63946;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.delete-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Bento Grid: Layout main container */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    grid-auto-rows: minmax(250px, auto);
+}
+
+/* Calendar card spans 2 columns */
+.calendar-card {
+    grid-column: span 2;
+}
+
+/* Timeline cards span 1 column each */
+.timeline-card {
+    grid-column: span 1;
+    grid-row: span 2;
+}
+
+/* Habit Tracker spans 2 columns to fit in the gap */
+#habitTrackerCard {
+    grid-column: span 2;
+}
+
+/* Bento Card Styles */
+.bento-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bento-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.card-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.nav-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.nav-btn:hover {
+    background: #5a6fd8;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 15px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.calendar-day:hover {
+    background: #f0f0f0;
+}
+
+.calendar-day.today {
+    background: #667eea;
+    color: white;
+}
+
+.calendar-day.has-event {
+    background: #ffd700;
+    color: #333;
+}
+
+.day-header {
+    font-weight: 600;
+    color: #666;
+    background: #f8f9fa;
+}
+
+/* Timeline Cards */
+.timeline-slot {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f8f9fa;
+    border-left: 4px solid #e0e0e0;
+    transition: all 0.3s;
+}
+
+.timeline-slot:hover {
+    background: #e8f4f8;
+    border-left-color: #667eea;
+}
+
+.timeline-time {
+    font-weight: 600;
+    color: #667eea;
+    min-width: 80px;
+}
+
+.timeline-content {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.timeline-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    outline: none;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.timeline-input:focus {
+    background: white;
+    box-shadow: 0 0 0 2px #667eea;
+}
+
+/* Goals Card */
+.goals-section {
+    margin-bottom: 20px;
+}
+
+.goals-section h4 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.goal-checkbox {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.goal-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.goal-input:focus {
+    background: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.add-goal-btn {
+    width: 100%;
+    padding: 10px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.add-goal-btn:hover {
+    background: #5a6fd8;
+}
+
+/* To-Do List Card */
+.todo-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s;
+}
+
+.todo-item:hover {
+    background: #e8f4f8;
+    border-color: #667eea;
+}
+
+.todo-checkbox {
+    margin-right: 12px;
+    transform: scale(1.2);
+}
+
+.todo-text {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.todo-completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.reward-badge {
+    background: #ffd700;
+    color: #333;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+/* Brain Dump Card */
+.brain-dump-textarea {
+    width: 100%;
+    min-height: 150px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.brain-dump-textarea:focus {
+    border-color: #667eea;
+}
+
+/* Don't Forget Card */
+.urgent-item {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.urgent-icon {
+    color: #d63031;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.urgent-text {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.urgent-input {
+    width: 100%;
+    border: 2px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    margin-top: 10px;
+}
+
+.urgent-input:focus {
+    border-color: #d63031;
+}
+
+/* Habit Tracker Card */
+.habit-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.habit-name {
+    flex-grow: 1;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    outline: none;
+    max-width: 200px;
+}
+
+.habit-name:focus {
+    background: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.habit-streak {
+    display: flex;
+    gap: 5px;
+    margin-left: 15px;
+}
+
+.streak-day {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.streak-day.completed {
+    background: #4caf50;
+}
+
+.streak-day.today {
+    border: 2px solid #667eea;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .bento-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .calendar-card {
+        grid-column: span 3;
+    }
+    
+    .timeline-card {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+    
+    #habitTrackerCard {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .calendar-card {
+        grid-column: span 1;
+    }
+    
+    .timeline-card {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .bento-card {
+        padding: 20px;
+    }
+    
+    #habitTrackerCard {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .bento-card {
+        padding: 15px;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Day Planner</h1>
+        </div>
+
+        <div class="bento-grid">
+            <!-- Calendar Card -->
+            <div class="bento-card calendar-card">
+                <div id="timeDateDay" style="text-align:center; font-weight: bold; font-size: 2rem; margin-bottom: 10px;"></div>
+                <br>
+                <div class="card-header">
+                    <span class="card-icon">📅</span>
+                    <h3 class="card-title">Calendar</h3>
+                </div>
+                <div class="calendar-nav">
+                    <button class="nav-btn" onclick="changeMonth(-1)">← Prev</button>
+                    <h4 id="currentMonth"></h4>
+                    <button class="nav-btn" onclick="changeMonth(1)">Next →</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Timeline Morning Card -->
+            <div class="bento-card timeline-card">
+                <div class="card-header">
+                    <span class="card-icon">🌅</span>
+                    <h3 class="card-title">Morning (4:00 AM - 12:00 PM)</h3>
+                </div>
+                <div id="timelineMorning" class="timeline-column"></div>
+            </div>
+
+            <!-- Timeline Afternoon Card -->
+            <div class="bento-card timeline-card">
+                <div class="card-header">
+                    <span class="card-icon">🌇</span>
+                    <h3 class="card-title">Afternoon & Evening (12:30 PM - 11:00 PM)</h3>
+                </div>
+                <div id="timelineEvening" class="timeline-column"></div>
+            </div>
+
+            <!-- Habit Tracker Card -->
+            <div class="bento-card" id="habitTrackerCard">
+                <div class="card-header">
+                    <span class="card-icon">🔄</span>
+                    <h3 class="card-title">Habit Tracker</h3>
+                </div>
+                <div id="habitList"></div>
+                <button class="add-goal-btn" onclick="addHabit()">+ Add Habit</button>
+            </div>
+
+            <!-- Goals Card -->
+            <div class="bento-card">
+                <div class="card-header">
+                    <span class="card-icon">🎯</span>
+                    <h3 class="card-title">Goals</h3>
+                </div>
+                <div class="goals-section">
+                    <h4>Daily Goals</h4>
+                    <div id="dailyGoals">
+                        <!-- Daily goals will be populated by JavaScript -->
+                    </div>
+                    <button class="add-goal-btn" onclick="addGoal('daily')">+ Add Daily Goal</button>
+                </div>
+
+                <div class="goals-section">
+                    <h4>Weekly Goals</h4>
+                    <div id="weeklyGoals">
+                        <!-- Weekly goals will be populated by JavaScript -->
+                    </div>
+                    <button class="add-goal-btn" onclick="addGoal('weekly')">+ Add Weekly Goal</button>
+                </div>
+
+                <div class="goals-section">
+                    <h4>Monthly Goals</h4>
+                    <div id="monthlyGoals">
+                        <!-- Monthly goals will be populated by JavaScript -->
+                    </div>
+                    <button class="add-goal-btn" onclick="addGoal('monthly')">+ Add Monthly Goal</button>
+                </div>
+            </div>
+
+            <!-- To-Do List Card -->
+            <div class="bento-card">
+                <div class="card-header">
+                    <span class="card-icon">✅</span>
+                    <h3 class="card-title">To-Do List</h3>
+                </div>
+                <div id="todoList">
+                    <!-- To-do items will be populated by JavaScript -->
+                </div>
+                <button class="add-goal-btn" onclick="addTodo()">+ Add Task</button>
+            </div>
+
+            <!-- Brain Dump Card -->
+            <div class="bento-card">
+                <div class="card-header">
+                    <span class="card-icon">🧠</span>
+                    <h3 class="card-title">Brain Dump</h3>
+                </div>
+                <textarea class="brain-dump-textarea" placeholder="Write down any thoughts, ideas, or random things on your mind..." id="brainDump"></textarea>
+            </div>
+
+            <!-- Don't Forget Card -->
+            <div class="bento-card">
+                <div class="card-header">
+                    <span class="card-icon">🚨</span>
+                    <h3 class="card-title">Don't Forget This!</h3>
+                </div>
+                <div id="urgentTasks">
+                    <!-- Urgent tasks will be populated by JavaScript -->
+                </div>
+                <input type="text" class="urgent-input" placeholder="Add urgent task or reminder..." id="urgentInput" onkeypress="handleUrgentInput(event)">
+            </div>
+        </div>
+    </div>
+
+<script>
+let appData = {
+    calendar: {},
+    timeline: {},
+    goals: { daily: [], weekly: [], monthly: [] },
+    todos: [],
+    brainDump: '',
+    urgentTasks: [],
+    mood: {},
+    habits: []
+};
+
+function loadData() {
+    const saved = localStorage.getItem('adhdPlannerData');
+    if (saved) appData = { ...appData, ...JSON.parse(saved) };
+
+    // Ensure goals arrays exist and are arrays
+    appData.goals.daily = Array.isArray(appData.goals.daily) ? appData.goals.daily : [];
+    appData.goals.weekly = Array.isArray(appData.goals.weekly) ? appData.goals.weekly : [];
+    appData.goals.monthly = Array.isArray(appData.goals.monthly) ? appData.goals.monthly : [];
+}
+
+function saveData() {
+    localStorage.setItem('adhdPlannerData', JSON.stringify(appData));
+}
+
+function updateTimeDateDay() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const date = now.toLocaleDateString(undefined, options);
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const display = `${time} • ${date}`;
+    document.getElementById('timeDateDay').textContent = display;
+}
+
+// ----------- Calendar ------------
+let currentDate = new Date();
+
+function initCalendar() {
+    updateCalendarDisplay();
+}
+
+function updateCalendarDisplay() {
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    document.getElementById('currentMonth').textContent =
+        new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const calendarGrid = document.getElementById('calendarGrid');
+    calendarGrid.innerHTML = '';
+
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        const el = document.createElement('div');
+        el.classList.add('calendar-day', 'day-header');
+        el.textContent = day;
+        calendarGrid.appendChild(el);
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+        calendarGrid.appendChild(document.createElement('div'));
+    }
+
+    const today = new Date();
+    for (let day = 1; day <= daysInMonth; day++) {
+        const el = document.createElement('div');
+        el.classList.add('calendar-day');
+        el.textContent = day;
+
+        if (
+            year === today.getFullYear() &&
+            month === today.getMonth() &&
+            day === today.getDate()
+        ) {
+            el.classList.add('today');
+        }
+
+        const key = `${year}-${month}-${day}`;
+        if (appData.calendar[key]) el.classList.add('has-event');
+        calendarGrid.appendChild(el);
+    }
+}
+
+function changeMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    updateCalendarDisplay();
+}
+
+// ----------- Timeline (30-min) ------------
+function initTimeline() {
+    const morningContainer = document.getElementById('timelineMorning');
+    const eveningContainer = document.getElementById('timelineEvening');
+    morningContainer.innerHTML = '';
+    eveningContainer.innerHTML = '';
+
+    // Morning: 4:00 AM - 12:00 PM (hours 4 to 11)
+    for (let hour = 4; hour < 12; hour++) {
+        for (let half = 0; half < 2; half++) {
+            createTimelineSlot(hour, half, morningContainer);
+        }
+    }
+
+    // Evening: 12:30 PM - 11:00 PM (hours 12 to 23 with half=1 for 12:30 and so on)
+    // We'll do 12:30 PM (12:30) to 11:00 PM (23:00)
+    // So hour=12 half=1 is 12:30, then hour=13 half=0 is 1:00 PM, etc.
+    // Let's go hour=12 half=1 to hour=23 half=0
+
+    for (let hour = 12; hour <= 23; hour++) {
+        for (let half = 0; half < 2; half++) {
+            // skip 12:00 (half=0) for evening timeline because morning timeline ended at 12:00
+            if (hour === 12 && half === 0) continue;
+            // skip 23:30 because your timeline ends at 11:00 PM (23:00)
+            if (hour === 23 && half === 1) continue;
+
+            createTimelineSlot(hour, half, eveningContainer);
+        }
+    }
+}
+
+function createTimelineSlot(hour, half, container) {
+    const timeKey = `${hour}:${half === 0 ? '00' : '30'}`;
+    const slot = document.createElement('div');
+    slot.classList.add('timeline-slot');
+
+    const label = document.createElement('div');
+    label.classList.add('timeline-time');
+    label.textContent = formatTime(hour, half);
+
+    const content = document.createElement('div');
+    content.classList.add('timeline-content');
+
+    const input = document.createElement('input');
+    input.classList.add('timeline-input');
+    input.placeholder = 'What are you doing?';
+    input.value = appData.timeline[timeKey] || '';
+    input.addEventListener('blur', () => {
+        appData.timeline[timeKey] = input.value;
+        saveData();
+    });
+
+    content.appendChild(input);
+    slot.appendChild(label);
+    slot.appendChild(content);
+    container.appendChild(slot);
+}
+
+function formatTime(hour, half) {
+    const h = hour % 12 || 12;
+    const m = half === 0 ? '00' : '30';
+    const ampm = hour < 12 ? 'AM' : 'PM';
+    return `${h}:${m} ${ampm}`;
+}
+
+// ----------- Goals ------------
+function initGoals() {
+    updateGoalSection('daily', 'dailyGoals');
+    updateGoalSection('weekly', 'weeklyGoals');
+    updateGoalSection('monthly', 'monthlyGoals');
+}
+
+function updateGoalSection(type, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    appData.goals[type].forEach((goal, index) => {
+        const item = document.createElement('div');
+        item.classList.add('goal-item');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.classList.add('goal-checkbox');
+        cb.checked = goal.completed;
+        cb.onchange = () => {
+            appData.goals[type][index].completed = cb.checked;
+            saveData();
+        };
+
+        const input = document.createElement('input');
+        input.classList.add('goal-input');
+        input.value = goal.text;
+        input.onblur = () => {
+            appData.goals[type][index].text = input.value;
+            saveData();
+        };
+
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.classList.add('delete-btn');
+        del.onclick = () => {
+            appData.goals[type].splice(index, 1);
+            updateGoalSection(type, containerId);
+            saveData();
+        };
+
+        item.appendChild(cb);
+        item.appendChild(input);
+        item.appendChild(del);
+        container.appendChild(item);
+    });
+}
+
+function addGoal(type) {
+    appData.goals[type].push({ text: '', completed: false });
+    updateGoalSection(type, `${type}Goals`);
+    saveData();
+}
+
+// ----------- To-Do ------------
+function initTodos() {
+    updateTodosDisplay();
+}
+
+function updateTodosDisplay() {
+    const list = document.getElementById('todoList');
+    list.innerHTML = '';
+    appData.todos.forEach((todo, index) => {
+        const item = document.createElement('div');
+        item.classList.add('todo-item');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.classList.add('todo-checkbox');
+        cb.checked = todo.completed;
+        cb.onchange = () => {
+            todo.completed = cb.checked;
+            text.classList.toggle('todo-completed', cb.checked);
+            saveData();
+        };
+
+        const text = document.createElement('input');
+        text.type = 'text';
+        text.classList.add('todo-text');
+        text.value = todo.text;
+        if (todo.completed) text.classList.add('todo-completed');
+        text.onblur = () => {
+            todo.text = text.value;
+            saveData();
+        };
+
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.classList.add('delete-btn');
+        del.onclick = () => {
+            appData.todos.splice(index, 1);
+            updateTodosDisplay();
+            saveData();
+        };
+
+        item.appendChild(cb);
+        item.appendChild(text);
+        item.appendChild(del);
+
+        if (todo.reward) {
+            const reward = document.createElement('span');
+            reward.classList.add('reward-badge');
+            reward.textContent = todo.reward;
+            item.appendChild(reward);
+        }
+
+        list.appendChild(item);
+    });
+}
+
+function addTodo() {
+    const reward = Math.random() < 0.3 ? '🎉' : '';
+    appData.todos.push({ text: '', completed: false, reward });
+    updateTodosDisplay();
+    saveData();
+}
+
+// ----------- Brain Dump ------------
+function initBrainDump() {
+    const el = document.getElementById('brainDump');
+    el.value = appData.brainDump || '';
+    el.onblur = () => {
+        appData.brainDump = el.value;
+        saveData();
+    };
+}
+
+// ----------- Urgent Tasks ------------
+function initUrgentTasks() {
+    updateUrgentTasksDisplay();
+}
+
+function updateUrgentTasksDisplay() {
+    const container = document.getElementById('urgentTasks');
+    container.innerHTML = '';
+    appData.urgentTasks.forEach((task, index) => {
+        const item = document.createElement('div');
+        item.classList.add('urgent-item');
+
+        const icon = document.createElement('span');
+        icon.classList.add('urgent-icon');
+        icon.textContent = '⚠️';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.classList.add('urgent-text');
+        input.value = task;
+        input.onblur = () => {
+            appData.urgentTasks[index] = input.value;
+            saveData();
+        };
+
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.classList.add('delete-btn');
+        del.onclick = () => {
+            appData.urgentTasks.splice(index, 1);
+            updateUrgentTasksDisplay();
+            saveData();
+        };
+
+        item.appendChild(icon);
+        item.appendChild(input);
+        item.appendChild(del);
+        container.appendChild(item);
+    });
+}
+
+function handleUrgentInput(e) {
+    if (e.key === 'Enter') {
+        const input = document.getElementById('urgentInput');
+        if (input.value.trim()) {
+            appData.urgentTasks.push(input.value.trim());
+            input.value = '';
+            updateUrgentTasksDisplay();
+            saveData();
+        }
+    }
+}
+
+
+// ----------- Habit Tracker ------------
+function initHabits() {
+    updateHabitsDisplay();
+}
+
+function updateHabitsDisplay() {
+    const list = document.getElementById('habitList');
+    list.innerHTML = '';
+    appData.habits.forEach((habit, index) => {
+        const item = document.createElement('div');
+        item.classList.add('habit-item');
+
+        const name = document.createElement('input');
+        name.classList.add('habit-name');
+        name.value = habit.name;
+        name.placeholder = 'Habit name';
+        name.onblur = () => {
+            habit.name = name.value;
+            saveData();
+        };
+
+        const streak = document.createElement('div');
+        streak.classList.add('habit-streak');
+
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateKey = date.toISOString().split('T')[0];
+
+            const dot = document.createElement('div');
+            dot.classList.add('streak-day');
+            if (habit.completedDays?.includes(dateKey)) dot.classList.add('completed');
+            if (i === 0) dot.classList.add('today');
+
+            dot.onclick = () => {
+                if (!habit.completedDays) habit.completedDays = [];
+                if (habit.completedDays.includes(dateKey)) {
+                    habit.completedDays = habit.completedDays.filter(d => d !== dateKey);
+                    dot.classList.remove('completed');
+                } else {
+                    habit.completedDays.push(dateKey);
+                    dot.classList.add('completed');
+                }
+                saveData();
+            };
+
+            streak.appendChild(dot);
+        }
+
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.classList.add('delete-btn');
+        del.onclick = () => {
+            appData.habits.splice(index, 1);
+            updateHabitsDisplay();
+            saveData();
+        };
+
+        item.appendChild(name);
+        item.appendChild(streak);
+        item.appendChild(del);
+        list.appendChild(item);
+    });
+}
+
+function addHabit() {
+    appData.habits.push({ name: '', completedDays: [] });
+    updateHabitsDisplay();
+    saveData();
+}
+
+// ----------- Init ------------
+function initApp() {
+    loadData();
+    updateTimeDateDay();
+    // updateCalendarDisplay(); 
+    setInterval(updateTimeDateDay, 60000);
+    initCalendar();
+    initTimeline();
+    initGoals();
+    initTodos();
+    initBrainDump();
+    initUrgentTasks();
+    initHabits();
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+setInterval(saveData, 30000);
+
+
+</script>
+
+
+</body>
+</html>
